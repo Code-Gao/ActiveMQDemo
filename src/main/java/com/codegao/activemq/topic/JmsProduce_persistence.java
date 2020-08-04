@@ -6,12 +6,12 @@ import javax.jms.*;
 
 /**
  * @author huanyu
- * @date 2020/7/27 16:08
+ * @date 2020/7/28 17:45
  */
 
-public class JmsProduce_Topic {
+public class JmsProduce_persistence {
     public static final String ACTIVEMQ_URL = "tcp://127.0.0.1:61616";
-    public static final String TOPIC_NAME = "MQ-topic";
+    public static final String TOPIC_NAME = "MQ-topic-persistence";
 
 
     public static void main(String[] args) throws JMSException {
@@ -19,7 +19,6 @@ public class JmsProduce_Topic {
         ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(ACTIVEMQ_URL);
         //2.通过连接工厂，获得connection连接
         Connection connection = activeMQConnectionFactory.createConnection();
-        connection.start();
 
         //3.创建会话session
         //两个参数，第一个叫事务/第二个叫签收
@@ -31,8 +30,11 @@ public class JmsProduce_Topic {
         //5.创建消息的生产者
         MessageProducer messageProducer = session.createProducer(topic);
 
+        //设置持久化topic
+        messageProducer.setDeliveryMode(DeliveryMode.PERSISTENT);
+        connection.start();
         //通过使用messageProducer
-        for(int i = 1; i<=3;i++){
+        for(int i = 1; i<=4;i++){
             //7.创建消息
             TextMessage textMessage = session.createTextMessage("TOPIC_NAME---"+i);
 

@@ -1,4 +1,4 @@
-package com.codegao.activemq.quene;
+package com.codegao.activemq.queue;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
@@ -13,13 +13,13 @@ import javax.jms.*;
 public class JmsProduce {
 
     public static final String ACTIVEMQ_URL = "tcp://127.0.0.1:61616";
-    public static final String QUENE_NAME = "quene01";
+    public static final String QUEUE_NAME = "queue01";
 
 
     public static void main(String[] args) throws JMSException {
         //1.创建连接工厂,按照给定的url地址，采用默认的用户名和密码
         ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(ACTIVEMQ_URL);
-        //2.通过连接工厂，获得connection俩姐
+        //2.通过连接工厂，获得connection连接
         Connection connection = activeMQConnectionFactory.createConnection();
         connection.start();
 
@@ -28,10 +28,13 @@ public class JmsProduce {
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
         //4.创建目的地（具体是对立还是主题topic）
-        Queue quene = session.createQueue(QUENE_NAME);
+        Queue quene = session.createQueue(QUEUE_NAME);
 
         //5.创建消息的生产者
         MessageProducer messageProducer = session.createProducer(quene);
+
+        // 非持久化
+//        messageProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
 
         //通过使用messageProducer
         for(int i = 1; i<=3;i++){

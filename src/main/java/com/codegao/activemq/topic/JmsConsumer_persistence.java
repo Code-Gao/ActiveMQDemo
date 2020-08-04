@@ -7,21 +7,23 @@ import java.io.IOException;
 
 /**
  * @author huanyu
- * @date 2020/7/27 16:14
+ * @date 2020/7/28 17:48
  */
 
-public class JmsConsumer_Topic {
+public class JmsConsumer_persistence {
     public static final String ACTIVEMQ_URL = "tcp://127.0.0.1:61616";
-    public static final String TOPIC_NAME = "MQ-topic";
+    public static final String TOPIC_NAME = "MQ-topic-persistence";
 
 
     public static void main(String[] args) throws JMSException, IOException {
-        System.out.println("***我是二号消费者");
+        System.out.println("***我是一号消费者");
         //1.创建连接工厂,按照给定的url地址，采用默认的用户名和密码
         ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(ACTIVEMQ_URL);
         //2.通过连接工厂，获得connection连接
         Connection connection = activeMQConnectionFactory.createConnection();
-        connection.start();
+
+        //设置客户端ID,向MQ服务器注册自己的名称
+        connection.setClientID("merry");
 
         //3.创建会话session
         //两个参数，第一个叫事务/第二个叫签收
@@ -30,29 +32,20 @@ public class JmsConsumer_Topic {
         //4.创建目的地（具体是对立还是主题topic）
         Topic topic = session.createTopic(TOPIC_NAME);
 
-        //5.创建消费者
-        MessageConsumer messageConsumer = session.createConsumer(topic);
+        //创建一个topic订阅者对象。一参是topic，二参事订阅者名称
+        TopicSubscriber topicSubscriber = session.createDurableSubscriber(topic,"remark...");
 
+        connection.start();
 
-        //通过监听的方式来消费消息
+        Message message = topicSubscriber.receive();
+        while (null != message){
+            TextMessage textMessage = (TextMessage) message;
+            System.out.println("收到的持久化 topic："+textMessage.getText());
+            message = topicSubscriber.receive();
+        }
 
-        messageConsumer.setMessageListener((Message message) ->{
-            if (null != message && message instanceof TextMessage){
-                TextMessage textMessage = (TextMessage) message;
-                try {
-                    System.out.println("***消费者接收到Topic消息："+textMessage.getText());
-                } catch (JMSException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        System.in.read();           //让进程不关闭
-        messageConsumer.close();
         session.close();
         connection.close();
-
-
-
 
     }
 }

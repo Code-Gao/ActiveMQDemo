@@ -1,4 +1,4 @@
-package com.codegao.activemq.quene;
+package com.codegao.activemq.queue;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
@@ -13,13 +13,13 @@ import java.io.IOException;
 public class JmsConsumer {
 
     public static final String ACTIVEMQ_URL = "tcp://127.0.0.1:61616";
-    public static final String QUENE_NAME = "quene01";
+    public static final String QUEUE_NAME = "queue01";
 
 
     public static void main(String[] args) throws JMSException, IOException {
         //1.创建连接工厂,按照给定的url地址，采用默认的用户名和密码
         ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(ACTIVEMQ_URL);
-        //2.通过连接工厂，获得connection俩姐
+        //2.通过连接工厂，获得connection连接
         Connection connection = activeMQConnectionFactory.createConnection();
         connection.start();
 
@@ -28,7 +28,7 @@ public class JmsConsumer {
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
         //4.创建目的地（具体是对立还是主题topic）
-        Queue quene = session.createQueue(QUENE_NAME);
+        Queue quene = session.createQueue(QUEUE_NAME);
 
         //5.创建消费者
         MessageConsumer messageConsumer = session.createConsumer(quene);
